@@ -13,7 +13,7 @@ $SourceSiteUrl = $SourceSiteUrl + "/"
 
 
 #Bind to site collection
-$clientContext = New-Object Microsoft.SharePoint.Client.ClientContext($WorkingSiteUrl)
+$clientContext = New-Object Microsoft.SharePoint.Client.ClientContext($SourceSiteUrl)
 $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredentials($UserName, $Password)
 $clientContext.Credentials = $credentials
 $clientContext.ExecuteQuery()
@@ -48,7 +48,7 @@ $clientContext.Load($userActions)
 $clientContext.ExecuteQuery()   
 
 $newRibbonItem = $userActions.Add()
-$newRibbonItem.RegistrationId = "100" 
+$newRibbonItem.RegistrationId = "100" #List #101 DocumentLib
 $newRibbonItem.Title = $tempRibbonItem.Title 
 $newRibbonItem.RegistrationType = [Microsoft.SharePoint.Client.UserCustomActionRegistrationType]::List 
 $newRibbonItem.Location = "CommandUI.Ribbon"
