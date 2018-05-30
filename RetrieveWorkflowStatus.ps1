@@ -8,7 +8,7 @@ param(
 #Add references to SharePoint client assemblies and authenticate to Office 365 site - required for CSOM
 Add-Type -Path “C:\Program Files\Common Files\microsoft shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.Client.dll”
 Add-Type -Path “C:\Program Files\Common Files\microsoft shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.Client.Runtime.dll”
-Add-Type -Path “C:\Program Files\Common Files\microsoft shared\Web Server Extensions\1\ISAPI\Microsoft.SharePoint.Client.WorkflowServices.dll”
+Add-Type -Path “C:\Program Files\Common Files\microsoft shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.Client.WorkflowServices.dll”
 
 #Connect to site collection
 $clientContext = New-Object Microsoft.SharePoint.Client.ClientContext($SiteUrl)
@@ -70,9 +70,9 @@ foreach ($workflowInstance in $workflowInstanceCollection)
     $clientContext.ExecuteQuery()
 
     #Cancel Workflows
-    $workflowServiceInstance.TerminateWorkflow($workflowInstance)
-    $clientContext.ExecuteQuery();        
-    write-output "Workflow terminated for:"$listItem["ID", “Title”]
+    #$workflowServiceInstance.TerminateWorkflow($workflowInstance)
+    #$clientContext.ExecuteQuery();        
+    #write-output "Workflow terminated for:"$listItem["ID", “Title”]
 
     Write-Host “”
     }

@@ -6,9 +6,9 @@ param(
 	)
 
 #Add references to SharePoint client assemblies and authenticate to Office 365 site - required for CSOM
-Add-Type -Path “C:\Program Files\Common Files\microsoft shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Client.dll”
-Add-Type -Path “C:\Program Files\Common Files\microsoft shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Client.Runtime.dll”
-Add-Type -Path “C:\Program Files\Common Files\microsoft shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Client.WorkflowServices.dll”
+Add-Type -Path “C:\Program Files\Common Files\microsoft shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.Client.dll”
+Add-Type -Path “C:\Program Files\Common Files\microsoft shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.Client.Runtime.dll”
+Add-Type -Path “C:\Program Files\Common Files\microsoft shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.Client.WorkflowServices.dll”
 
 #Connect to site collection
 $clientContext = New-Object Microsoft.SharePoint.Client.ClientContext($SiteUrl)
@@ -19,7 +19,7 @@ $clientContext.Credentials = $credentials
 
 $list = $clientContext.get_web().get_lists().getByTitle($ListName);
 $camlQuery = New-Object Microsoft.Sharepoint.Client.CamlQuery;
-$camlQuery.ViewXml = "<View><Query /><RowLimit>300</RowLimit></View>"
+$camlQuery.ViewXml = "<View><Query /><RowLimit>5000</RowLimit></View>"
 $listItems = $list.GetItems($camlQuery);
 $clientContext.Load($list)
 $clientContext.Load($listItems);
@@ -32,6 +32,10 @@ $clientContext.Load($workflowServicesManager);
 $clientContext.Load($workflowServiceInstance);
 $clientContext.ExecuteQuery();
 
+$totalCompleted = 0
+$totalSuspended = 0
+$totalStarted = 0
+
 #Check list item that contain workflow instances
 foreach($listItem in $listItems)
 {
@@ -40,6 +44,9 @@ $workflowInstanceCollection = $workflowServiceInstance.EnumerateInstancesForList
 $clientContext.Load($workflowInstanceCollection);
 $clientContext.ExecuteQuery();
 
+if($workflowInstanceCollection.Count -eq 0){
+    Write-Host "No workflow instanceId for listItem.Id:"$listItem.Id
+}
 
 foreach ($workflowInstance in $workflowInstanceCollection)
 {
@@ -47,37 +54,20 @@ foreach ($workflowInstance in $workflowInstanceCollection)
     #Retrieve error message(Description) from workflow history.
     if ($workflowInstance.Status -eq "Suspended")
     {
-    Write-Host “List Item Title:”$listItem["ID", “Name”]
-    Write-Host “Workflow Status:”$workflowInstance.Status
 
-    $listHistory = $clientContext.get_web().get_lists().getByTitle("Workflow History")
-    $camlQueryHistory = New-Object Microsoft.Sharepoint.Client.CamlQuery;
-    $camlQueryHistory.ViewXml = "<View><Query><ViewFields><FieldRef Name='Description' /></ViewFields><Where><Eq><FieldRef Name='WorkflowInstance' /><Value Type='Text'>"+ $workflowInstance.Id + "</Value></Eq></Where></Query><RowLimit>300</RowLimit></View>"
-    $listItemsHistory = $listHistory.GetItems($camlQueryHistory)
-    $clientContext.Load($listHistory)
-    $clientContext.Load($listItemsHistory)
-    $clientContext.ExecuteQuery()
+    $totalSuspended = $totalSuspended + 1;
 
-        foreach($listItemHistory in $listItemsHistory)
-        {
-            Write-Host “Error Message: ”$listItemHistory.FieldValues.Description
-        }
-    Write-Host “Last Updated:”$workflowInstance.LastUpdated
-
-    #Update error message to specify item contain workflow status is suspended.
-    #Replace ["Actual_x0020_result"] withother internal field name for other field.
-    $listItem["Actual_x0020_result"] = $listItemHistory.FieldValues.Description
-    $listItem["Workflow_x0020_run"] = "No"
-    $listItem.Update()
-    $clientContext.ExecuteQuery()
-
-    #Cancel Workflows
-    $workflowServiceInstance.TerminateWorkflow($workflowInstance)
-    $clientContext.ExecuteQuery();        
-    write-output "Workflow terminated for:"$listItem["ID", “Title”]
-
-    Write-Host “”
+    }
+    elseif($workflowInstance.Status -eq "Completed"){
+        $totalCompleted = $totalCompleted + 1;
+    }
+    elseif($workflowInstance.Status -eq "Started"){
+        $totalStarted = $totalStarted + 1;
     }
 
 }
 }
+
+Write-Host "Total Completed:"$totalCompleted
+Write-Host "Total Suspended:"$totalSuspended
+Write-Host "Total Started:"$totalStarted
