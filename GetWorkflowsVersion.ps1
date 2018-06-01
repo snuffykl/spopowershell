@@ -44,7 +44,7 @@ $clientContext.Load($WorkflowDefinitions)
 $clientContext.ExecuteQuery()
 
 $i = 0;
-$WorkflowDefinitions | Select-Object -InformationAction Inquire Selection, DisplayName,Id,RestrictToType |  ForEach-Object {$_.Selection = $i++; $_}  | out-host
+$WorkflowDefinitions | Select-Object -InformationAction Inquire Selection, DisplayName,Id,RestrictToType,Published |  ForEach-Object {$_.Selection = $i++; $_}  | out-host
 
 $selectionWorkflow = Read-Host 'Which workflow do you select from above (Selection)?'
 
