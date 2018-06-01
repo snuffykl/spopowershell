@@ -1,7 +1,6 @@
 ﻿param(
     [System.String][Parameter(Mandatory=$true)]$SiteUrl,
     [System.String][Parameter(Mandatory=$true)]$ListName,
-    [System.String][Parameter(Mandatory=$true)]$CustomTemplateTitle,
     [System.String][Parameter(Mandatory=$true)]$UserName,
 	[System.Security.SecureString][Parameter(Mandatory=$true)]$SecurePassword
 	)
@@ -21,21 +20,17 @@ $credentials = New-Object Microsoft.SharePoint.Client.SharePointOnlineCredential
 $ClientContext.Credentials = $credentials
 $ClientContext.ExecuteQuery()
 
-$Web = $ClientContext.Web
-$ListTemplates = $ClientContext.Site.GetCustomListTemplates($Web)
-$ClientContext.Load($ListTemplates)
+# Get List
+$List = $ClientContext.Web.Lists.GetByTitle($ListName)
+$ClientContext.Load($List)
 $ClientContext.ExecuteQuery()
 
-$listTemplate = $ListTemplates | Where Name -eq $CustomTemplateTitle
-
-# Task List creation
-$listCreationInformation = New-Object Microsoft.SharePoint.Client.ListCreationInformation
-$listCreationInformation.Title = $ListName
-$listCreationInformation.Description = $ListName
-$listCreationInformation.TemplateType = $listTemplate.ListTemplateTypeKind
-$listCreationInformation.TemplateFeatureId = $listTemplate.FeatureId
-$listCreationInformation.ListTemplate = $listTemplate
-
-$list = $ClientContext.Web.Lists.Add($listCreationInformation)
-$ClientContext.Load($list)
-$ClientContext.ExecuteQuery()
+# Loop Create List Item
+for ($i=1; $i -le 1000; $i++)
+{
+  $ListItemCreationInformation = New-Object Microsoft.SharePoint.Client.ListItemCreationInformation
+  $NewListItem = $List.AddItem($ListItemCreationInformation)
+  $NewListItem["Title"] = "abc$($i)"
+  $NewListItem.Update()
+  $ClientContext.ExecuteQuery()
+}

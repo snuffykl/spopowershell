@@ -3,10 +3,14 @@
 	[System.Security.SecureString][Parameter(Mandatory=$true)]$Password
 	)
 
+$SPClientPathAssembly = $PWD.Path + "\Assembly\Microsoft.SharePoint.Client.dll"
+$SPClientRuntimePathAssembly = $PWD.Path + “\Assembly\Microsoft.SharePoint.Client.Runtime.dll”
+$SPClientWorkflowServicesAssembly = $PWD.Path + “\Assembly\Microsoft.SharePoint.Client.WorkflowServices.dll”
+
 #Add references to SharePoint client assemblies and authenticate to Office 365 site - required for CSOM
-Add-Type -Path “C:\Program Files\Common Files\microsoft shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.Client.dll”
-Add-Type -Path “C:\Program Files\Common Files\microsoft shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.Client.Runtime.dll”
-Add-Type -Path “C:\Program Files\Common Files\microsoft shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.Client.WorkflowServices.dll”
+Add-Type -Path $SPClientPathAssembly
+Add-Type -Path $SPClientRuntimePathAssembly
+Add-Type -Path $SPClientWorkflowServicesAssembly
 
 $SourceSiteUrl = Read-Host 'Which site (SiteUrl) is working in SP Ribbon for the Nintex Workflow icon ?'
 $SourceSiteUrl = $SourceSiteUrl + "/"

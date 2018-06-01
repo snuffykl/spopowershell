@@ -4,10 +4,14 @@
 	[System.Security.SecureString][Parameter(Mandatory=$true)]$Password
 	)
 
+$SPClientPathAssembly = $PWD.Path + "\Assembly\Microsoft.SharePoint.Client.dll"
+$SPClientRuntimePathAssembly = $PWD.Path + “\Assembly\Microsoft.SharePoint.Client.Runtime.dll”
+$SPClientWorkflowServicesAssembly = $PWD.Path + “\Assembly\Microsoft.SharePoint.Client.WorkflowServices.dll”
+
 #Add references to SharePoint client assemblies and authenticate to Office 365 site - required for CSOM
-Add-Type -Path “C:\Program Files\Common Files\microsoft shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.Client.dll”
-Add-Type -Path “C:\Program Files\Common Files\microsoft shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.Client.Runtime.dll”
-Add-Type -Path “C:\Program Files\Common Files\microsoft shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.Client.WorkflowServices.dll”
+Add-Type -Path $SPClientPathAssembly
+Add-Type -Path $SPClientRuntimePathAssembly
+Add-Type -Path $SPClientWorkflowServicesAssembly
 
 $SiteUrl = $SiteUrl + "/"
 
@@ -44,7 +48,7 @@ $clientContext.Load($WorkflowDefinitions)
 $clientContext.ExecuteQuery()
 
 $i = 0;
-$WorkflowDefinitions | Select-Object -InformationAction Inquire Selection, DisplayName,Id,RestrictToType,Published |  ForEach-Object {$_.Selection = $i++; $_}  | out-host
+$WorkflowDefinitions | Select-Object -InformationAction Inquire Selection, DisplayName, Id, Published, RestrictToType |  ForEach-Object {$_.Selection = $i++; $_}  | out-host
 
 $selectionWorkflow = Read-Host 'Which workflow do you select from above (Selection)?'
 

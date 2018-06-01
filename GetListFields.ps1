@@ -5,9 +5,9 @@
 	[System.Security.SecureString][Parameter(Mandatory=$true)]$SecurePassword
 	)
 
-$SPClientPathAssembly = $PWD.Path + "\Microsoft.SharePoint.Client.dll"
-$SPClientRuntimePathAssembly = $PWD.Path + “\Microsoft.SharePoint.Client.Runtime.dll”
-$SPClientWorkflowServicesAssembly = $PWD.Path + “\Microsoft.SharePoint.Client.WorkflowServices.dll”
+$SPClientPathAssembly = $PWD.Path + "\Assembly\Microsoft.SharePoint.Client.dll"
+$SPClientRuntimePathAssembly = $PWD.Path + “\Assembly\Microsoft.SharePoint.Client.Runtime.dll”
+$SPClientWorkflowServicesAssembly = $PWD.Path + “\Assembly\Microsoft.SharePoint.Client.WorkflowServices.dll”
 
 #Add references to SharePoint client assemblies and authenticate to Office 365 site - required for CSOM
 Add-Type -Path $SPClientPathAssembly
